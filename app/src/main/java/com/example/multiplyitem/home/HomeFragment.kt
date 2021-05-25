@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.multiplyitem.databinding.FragmentHomeBinding
 
-class HomeFragment : Fragment(), OnItemClickListener {
+class HomeFragment() : Fragment(), OnItemClickListener {
 
     private lateinit var homeBinding : FragmentHomeBinding
     private lateinit var viewModel: HomeViewModel
