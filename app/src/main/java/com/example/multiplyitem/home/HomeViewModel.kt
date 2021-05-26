@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 class HomeViewModel : ViewModel() {
 
     private val _list = MutableLiveData<List<Data>>()
-    val list : LiveData<List<Data>>
+    val list: LiveData<List<Data>>
         get() = _list
 
     private var lastSelectedItemPosition = -1
@@ -17,41 +17,51 @@ class HomeViewModel : ViewModel() {
         _list.value = immutableList
     }
 
-    fun onItemClick(position : Int) {
-        val newList : ArrayList<Data> = ArrayList<Data>().apply {
+    fun onItemClick(position: Int) {
+        val currentSelectedPosition =
+            if (lastSelectedItemPosition < position)
+                position - lastSelectedItemPosition - 1
+            else
+                position
+
+        val newList: ArrayList<Data> = ArrayList<Data>().apply {
             addAll(list.value!!)
         }
 
-        if (lastSelectedItemPosition == position){ //For removing generated items
-            newList[position].isSelected = false
+        if (lastSelectedItemPosition == currentSelectedPosition) { //For removing generated items
+            newList[currentSelectedPosition].isSelected = false
             lastSelectedItemPosition = -1
 
 
-            val currentSelectedData = newList[position]
+            val currentSelectedData = newList[currentSelectedPosition]
             val totalItemsToRemove = currentSelectedData.value
 
-            for (i in 1..totalItemsToRemove){
-                newList.removeAt(position + 1)
+            for (i in 1..totalItemsToRemove) {
+                newList.removeAt(currentSelectedPosition + 1)
             }
 
         } else {                                    // For adding new items
-            newList[position].isSelected = !newList[position].isSelected
-            if (lastSelectedItemPosition != -1){
+            if (lastSelectedItemPosition != -1) {
                 newList[lastSelectedItemPosition].isSelected = false
+
+                val totalItemsToRemove = newList[lastSelectedItemPosition].value
+                for (i in 1..totalItemsToRemove){
+                    newList.removeAt(lastSelectedItemPosition + 1)
+                }
             }
 
-            lastSelectedItemPosition = position
-
+            newList[currentSelectedPosition].isSelected = !newList[currentSelectedPosition].isSelected
+            lastSelectedItemPosition = currentSelectedPosition
 
             val tempList = ArrayList<Data>()
-            val currentSelectedData = newList[position]
+            val currentSelectedData = newList[currentSelectedPosition]
             val totalNewItems = currentSelectedData.value
 
-            for (i in 1..totalNewItems){
+            for (i in 1..totalNewItems) {
                 tempList.add(Data(currentSelectedData.value, false, false))
             }
 
-            newList.addAll(position + 1, tempList)
+            newList.addAll(currentSelectedPosition + 1, tempList)
         }
 
         _list.value = newList
@@ -65,13 +75,13 @@ class HomeViewModel : ViewModel() {
 }
 
 data class Data(
-    val value : Int,
-    var isSelected : Boolean = false,
-    var isSelectable : Boolean = true
+    val value: Int,
+    var isSelected: Boolean = false,
+    var isSelectable: Boolean = true
 )
 
-val immutableList : List<Data> = ArrayList<Data>().apply {
-    for (i in 1..5){
+val immutableList: List<Data> = ArrayList<Data>().apply {
+    for (i in 1..5) {
         add(Data(i))
     }
 }
